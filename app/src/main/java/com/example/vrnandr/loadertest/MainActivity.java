@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                Intent intent = new Intent(MainActivity.this, SelectActivity.class);
                 startActivity(intent);
             }
         });
@@ -42,11 +42,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         DBHelper dbHelper = new DBHelper(this);
         database = dbHelper.getWritableDatabase();
-        Cursor cursor = database.rawQuery("SELECT * FROM mytable",null);
+
         adapter = new SimpleCursorAdapter(this,
                 android.R.layout.simple_list_item_1,
                 null,
-                new String[] {"text"},
+                new String[] {"Date"},
                 new int[]{android.R.id.text1}
         );
 
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new myCursorLoader(this,database);
+        return new myCursorLoader(this,database, "Works");
     }
 
     @Override
