@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -46,12 +47,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         adapter = new SimpleCursorAdapter(this,
                 android.R.layout.simple_list_item_1,
                 null,
-                new String[] {"Date"},
+                new String[] {"WorkID"},
                 new int[]{android.R.id.text1}
         );
 
         ListView listView = findViewById(R.id.listview);
         listView.setAdapter(adapter);
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                database.execSQL("DELETE FROM Works WHERE _id="+id);
+                getLoaderManager().getLoader(0).forceLoad();
+            }
+        });
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -84,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new myCursorLoader(this,database, "Works");
+        return new myCursorLoader(this, id, null);
     }
 
     @Override
@@ -94,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        adapter.swapCursor(null);
     }
 
     @Override

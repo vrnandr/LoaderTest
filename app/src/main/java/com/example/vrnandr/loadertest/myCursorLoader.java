@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 /**
  * Created by Andrey on 22.05.2018.
@@ -12,15 +13,26 @@ import android.database.sqlite.SQLiteDatabase;
 public class myCursorLoader extends CursorLoader {
     private SQLiteDatabase database;
     private String tableName;
+    private int id;
+    private String[] args;
 
-    public myCursorLoader(Context context, SQLiteDatabase database, String tableName) {
+    public myCursorLoader(Context context,int id, String[] args) {
         super(context);
-        this.database = database;
-        this.tableName = tableName;
+
+        DBHelper dbHelper = new DBHelper(context);
+        database = dbHelper.getWritableDatabase();
+
+        this.id= id;
+        this.args = args;
     }
 
     @Override
     public Cursor loadInBackground() {
-        return database.rawQuery("SELECT * FROM "+tableName, null);
+        switch (id){
+            case 0: return database.rawQuery("SELECT * FROM Works", null);
+            case 1: return database.rawQuery("SELECT * FROM ServiceCatalog GROUP BY Service", null);
+            case 2: return database.rawQuery("SELECT * FROM ServiceCatalog WHERE Service = '"+args[0]+"'", null);
+            default: return null;
+        }
     }
 }
