@@ -10,11 +10,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class Main2Activity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -49,11 +51,15 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
 
         listView.setAdapter(adapter);
 
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        final String dateString = format.format(date);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "onItemClick: "+id);
-                database.execSQL("INSERT INTO Works(WorkID) VALUES("+id+")");
+                database.execSQL("INSERT INTO Works(Date, WorkID) VALUES('"+dateString+"','"+id+"')");
                 Intent intent1 = new Intent(Main2Activity.this, MainActivity.class);
                 intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent1);
@@ -73,7 +79,7 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new myCursorLoader(this, id, new String[]{service});
+        return new MyCursorLoader(this, id, new String[]{service});
     }
 
     @Override

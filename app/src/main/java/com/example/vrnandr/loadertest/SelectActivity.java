@@ -59,7 +59,7 @@ public class SelectActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new myCursorLoader(this, id, null);
+        return new MyCursorLoader(this, id, null);
     }
 
     @Override
