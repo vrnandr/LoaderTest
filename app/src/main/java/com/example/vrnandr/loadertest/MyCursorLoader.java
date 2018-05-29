@@ -32,14 +32,14 @@ public class MyCursorLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        String dateString = format.format(date);
         switch (id){
-            case 0: return database.rawQuery("SELECT * FROM Works", null);
+            case 0: return database.rawQuery("select Works._id, Works.Date as date, sum(ServiceCatalog.TimeNorm) as sum from Works inner join ServiceCatalog on Works.WorkID=ServiceCatalog._id group by Date order by Date desc", null);
             case 1: return database.rawQuery("SELECT * FROM ServiceCatalog GROUP BY Service", null);
             case 2: return database.rawQuery("SELECT * FROM ServiceCatalog WHERE Service = '"+args[0]+"'", null);
-            case 3: Date date = new Date();
-                    SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-                    String dateString = format.format(date);
-                    return database.rawQuery("select Works._id, Works.Date, sum(ServiceCatalog.TimeNorm) from Works inner join ServiceCatalog on ServiceCatalog._id=Works.WorkID where date = '"+dateString+"'", null);
+            case 3: return database.rawQuery("select Works._id, Works.Date, sum(ServiceCatalog.TimeNorm) from Works inner join ServiceCatalog on ServiceCatalog._id=Works.WorkID where date = '"+dateString+"'", null);
             default: return null;
         }
     }

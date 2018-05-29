@@ -15,14 +15,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.SimpleCursorTreeAdapter;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private SQLiteDatabase database;
-    private CursorAdapter adapter;
-    private Menu menu;
+    //private CursorAdapter adapter;
+    private SimpleCursorTreeAdapter adapter;
+    //private Menu menu;
+    private MenuItem menuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         DBHelper dbHelper = new DBHelper(this);
         database = dbHelper.getWritableDatabase();
 
-        adapter = new SimpleCursorAdapter(this,
+        /*adapter = new SimpleCursorAdapter(this,
                 android.R.layout.simple_list_item_1,
                 null,
                 new String[] {"WorkID"},
@@ -63,9 +67,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 getLoaderManager().getLoader(0).forceLoad();
                 invalidateOptionsMenu();
             }
-        });
+        });*/
+
+        adapter = new SimpleCursorTreeAdapter(
+                this,
+
+                null,
+                android.R.layout.simple_expandable_list_item_2,
+                new String[] {"date","sum"},
+                new int[] {android.R.id.text1,android.R.id.text2},
+
+                android.R.layout.simple_expandable_list_item_2,
+                new String[]{"work", "time"},
+                new int[] {android.R.id.text1,android.R.id.text2 }
+        ) {
+            @Override
+            protected Cursor getChildrenCursor(Cursor cursor) {
+                return null;
+            }
+        };
+
+        ExpandableListView listView = findViewById(R.id.expandableListView);
+        listView.setAdapter(adapter);
 
         getLoaderManager().initLoader(0, null, this);
+        //getLoaderManager().initLoader(4, null, this);
 
 
 
@@ -77,8 +103,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        this.menu = menu;
-        getLoaderManager().initLoader(3,null, menuData);
+        menuItem = menu.findItem(R.id.count);
+        //this.menu = menu;
+        getLoaderManager().initLoader(3,null, this);
         return true;
     }
 
@@ -103,40 +130,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
+        switch (loader.getId()){
+            case 0: adapter.changeCursor(data);
+                    break;
+            case 3: if (data.moveToFirst())
+                        menuItem.setTitle(data.getString(2));
+                    break;
+        }
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+        adapter.changeCursor(null);
     }
 
-
-    private LoaderManager.LoaderCallbacks<Cursor> menuData = new LoaderManager.LoaderCallbacks<Cursor>() {
-        @Override
-        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            return new MyCursorLoader(getApplicationContext(), i,null);
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-            Log.d("my", "onLoadFinished: "+menu);
-            MenuItem menuItem = menu.findItem(R.id.count);
-
-            if (cursor.moveToFirst())
-                menuItem.setTitle(cursor.getString(2));
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-
-        }
-    };
 
     @Override
     protected void onResume() {
         super.onResume();
         getLoaderManager().getLoader(0).forceLoad();
-        //;
     }
 }
