@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private SimpleCursorTreeAdapter adapter;
     //private Menu menu;
     private MenuItem menuItem;
+    private final String TAG="my";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +84,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ) {
             @Override
             protected Cursor getChildrenCursor(Cursor cursor) {
+                int id = cursor.getPosition()+100;
+                CharSequence date = cursor.getString(1);
+                Bundle bundle = new Bundle();
+                bundle.putCharSequence("date", date);
+                Loader<Cursor> myCursorLoader = getLoaderManager().getLoader(id);
+                if (myCursorLoader!= null && !myCursorLoader.isReset()){
+                    getLoaderManager().restartLoader(id,bundle,MainActivity.this);
+                } else
+                    getLoaderManager().initLoader(id,bundle,MainActivity.this);
                 return null;
             }
         };
@@ -125,17 +135,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (id>=100&&!args.isEmpty()) {
+            return new MyCursorLoader(this, id, new String[]{args.getString("date")});
+        }
         return new MyCursorLoader(this, id, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()){
+        int id = loader.getId();
+        Log.d(TAG, "onLoadFinished: "+id);
+        switch (id){
             case 0: adapter.changeCursor(data);
                     break;
             case 3: if (data.moveToFirst())
                         menuItem.setTitle(data.getString(2));
                     break;
+        }
+
+        if (id>=100){
+            adapter.setChildrenCursor(id-100,data);
         }
 
     }

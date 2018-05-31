@@ -40,7 +40,9 @@ public class MyCursorLoader extends CursorLoader {
             case 1: return database.rawQuery("SELECT * FROM ServiceCatalog GROUP BY Service", null);
             case 2: return database.rawQuery("SELECT * FROM ServiceCatalog WHERE Service = '"+args[0]+"'", null);
             case 3: return database.rawQuery("select Works._id, Works.Date, sum(ServiceCatalog.TimeNorm) from Works inner join ServiceCatalog on ServiceCatalog._id=Works.WorkID where date = '"+dateString+"'", null);
-            default: return null;
         }
+        if (id>=100)
+            return database.rawQuery("select Works._id, ServiceCatalog.Service as work, ServiceCatalog.TimeNorm as time from ServiceCatalog inner join Works on ServiceCatalog._id=Works.WorkID where date = '"+args[0]+"'", null);
+        return null;
     }
 }
