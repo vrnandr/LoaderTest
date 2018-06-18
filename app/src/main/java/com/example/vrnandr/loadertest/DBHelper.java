@@ -11,8 +11,11 @@ import android.util.Log;
  */
 
  public class DBHelper extends SQLiteOpenHelper {
-        public DBHelper(Context context) {
-            super(context, "db", null, 1);
+
+    private static final int DB_VERSION = 2;
+
+    public DBHelper(Context context) {
+            super(context, "db", null, DB_VERSION);
         }
 
     @Override
@@ -247,7 +250,8 @@ import android.util.Log;
     }
 
         @Override
-        public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion==1 && newVersion==2)
+                db.execSQL("UPDATE Works SET Date = substr(Date, 7, 4) || '-' || substr(Date, 4,2) || '-' || substr(Date, 1,2)");
         }
 }

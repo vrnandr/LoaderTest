@@ -52,7 +52,7 @@ public class Main2Activity extends AppCompatActivity implements LoaderManager.Lo
         listView.setAdapter(adapter);
 
         Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         final String dateString = format.format(date);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
