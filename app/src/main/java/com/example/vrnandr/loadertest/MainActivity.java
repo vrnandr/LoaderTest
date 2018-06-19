@@ -1,6 +1,7 @@
 package com.example.vrnandr.loadertest;
 
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -19,6 +20,7 @@ import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorTreeAdapter;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -75,8 +77,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 null,
                 android.R.layout.simple_expandable_list_item_2,
-                new String[] {"date","sum"},
-                new int[] {android.R.id.text1,android.R.id.text2},
+                null,
+                null,
+                /*new String[] {"date","sum"},
+                new int[] {android.R.id.text1,android.R.id.text2},*/
 
                 android.R.layout.simple_expandable_list_item_2,
                 new String[]{"work", "time"},
@@ -94,6 +98,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 } else
                     getLoaderManager().initLoader(id,bundle,MainActivity.this);
                 return null;
+            }
+
+            @Override
+            protected void bindGroupView(View view, Context context, Cursor cursor, boolean isExpanded) {
+                TextView date = view.findViewById(android.R.id.text1);
+                String dateString = cursor.getString(1);
+                String dateStringForView = dateString.substring(8,10)+"."+dateString.substring(5,7)+"."+dateString.substring(0,4);
+                date.setText(dateStringForView);
+                TextView sum = view.findViewById(android.R.id.text2);
+                sum.setText(cursor.getString(2));
             }
         };
 
